@@ -19,18 +19,18 @@ Code Repository to pre-process the Brain Navigation Data
 
 ### Data and timestamp of each sensor for synchronizing 
 - Videos:
-    - We use videos from the “Synced” folder, as they are concatenated to one video. And we split audio from videos.
-          * Data in “Synced” folder: pupil and Gopro video are both 60fps; synchronized and have the same length.
-          * Data in “Original” folder: pupil video is 80fps; Gopro video is 60fps and has multiple videos; Gopro and pupil videos have time shifts.
-    - We use frames from “RWNApp_RW1_Walk1.mat” for synchronization.
+    - Data: We use videos from the “Synced” folder, as they are concatenated to one video. And we split audio from videos.
+        - Data in “Synced” folder: pupil and Gopro video are both 60fps; synchronized and have the same length.
+        - Data in “Original” folder: pupil video is 80fps; Gopro video is 60fps and has multiple videos; Gopro and pupil videos have time shifts.
+    - Timestamp: We use frames from “RWNApp_RW1_Walk1.mat” for synchronization.
 - Xsense:
-    - We use data from “Original” folder, and only choose “xs_Center-of-Mass.csv”.
-    - We use timestamps from “RWNApp_RW1_Walk1.mat” for synchronization.
+    - Data: We use data from “Original” folder, and only choose “xs_Center-of-Mass.csv”.
+    - Timestamp: We use timestamps from “RWNApp_RW1_Walk1.mat” for synchronization.
 - Phone data:
-    - We use data from “Original” folder
+    - Data: We use data from “Original” folder
         - “ChestPhone”: light, acc, gyro, mag, GPS
         - “PupilPhone”: acc, gyro, mag, GPS
-    - We use NTP time in each csv file for synchronization.
+    - Timestamp: We use NTP time in each csv file for synchronization.
 - Label: “label_RWNApp_Output_Jan2024”
 
 ### Data after synchronization: 14 files for each event
