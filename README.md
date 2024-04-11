@@ -12,7 +12,7 @@ Code Repository to pre-process the Brain Navigation Data
   
 ## Tasks of data processing
 - Extract labels, data and timestamp from matlab files; and put other valid sensor data in the same folder:
-    - Extract labels from matlab filesand, and save to csv files: ```extract_mat_label.m```
+    - Extract labels from matlab files, and save to csv files: ```extract_mat_label.m```
     - Extrac data and timestamp from matlab files, and save to the same folder: ```extract_mat_data.py```
 - Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels: ```syncronize.py```
 - Select data from 13 events of interest.
