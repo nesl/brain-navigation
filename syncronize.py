@@ -197,15 +197,15 @@ data_np = np.load(load_syncronized_folder + 'data_np.npy')
 time_np = np.load(load_syncronized_folder + 'time_np.npy')
 
 ## load Gopro video
-data_gopro = load_syncronized_folder + 'video1_1_gopro.mp4'
+data_gopro = load_syncronized_folder + 'data_gopro_video.mp4'
 time_gopro = np.load(load_syncronized_folder + 'time_gopro.npy')
 
 ## load Pupil video
-data_pupil = load_syncronized_folder + 'video1_1_pupil.mp4'
+data_pupil = load_syncronized_folder + 'data_pupil_video.mp4'
 time_pupil = np.load(load_syncronized_folder + 'time_pupil.npy')
 
 ## load xsense data: only center of mass currently
-df_xsense = pd.read_csv(load_syncronized_folder + 'xs_Center-of-Mass.csv')
+df_xsense = pd.read_csv(load_syncronized_folder + 'data_xs_Center-of-Mass.csv')
 time_xsense = np.load(load_syncronized_folder + 'time_xs.npy')
 data_xsense = df_xsense.iloc[:, 1:]
 
