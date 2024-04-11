@@ -37,8 +37,7 @@ Code Repository to pre-process the Brain Navigation Data
 - {}_gopro.mp4, {}_pupil.mp4, {}_gopro_audio.wav, 
 - {}_np.npy, 
 - {}_xs_CoM.npy, 
-- {}_chestphone_acc.npy, {}_chestphone_gyro.npy, {}_chestphone_mag.npy, {}_chestphone_gps.npy,
-- {}_chestphone_light.npy, 
+- {}_chestphone_acc.npy, {}_chestphone_gyro.npy, {}_chestphone_mag.npy, {}_chestphone_gps.npy, {}_chestphone_light.npy, 
 - {}_pupilphone_acc.npy, {}_pupilphone_gyro.npy, {}_pupilphone_mag.npy, {}_pupilphone_gps.npy
 
   
