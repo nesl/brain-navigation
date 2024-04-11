@@ -11,7 +11,9 @@ Code Repository to pre-process the Brain Navigation Data
 - Events of Interests (13 events): Doorway, Talking, Correct Turn,  Incorrect Turn, Lost, Stop, Abnormal, Pointing, Outdoor, Choice Point, Stare, Beg/End, New Context
   
 ## Tasks of data processing
-- Extract and put all valid sensor data in the same folder:  ```extract_mat_data.py```
+- Extract labels, data and timestamp from matlab files; and put other valid sensor data in the same folder:
+    - Extract labels from matlab filesand, and save to csv files: ```extract_mat_label.m```
+    - Extrac data and timestamp from matlab files, and save to the same folder: ```extract_mat_data.py```
 - Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels: ```syncronize.py```
 - Select data from 13 events of interest.
 - Slice data into windows of T seconds (T needs to be defined later) and filter out invalid data.
