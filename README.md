@@ -14,7 +14,7 @@ Code Repository to pre-process the Brain Navigation Data
 - Extract labels, data and timestamp from matlab files; and put other valid sensor data in the same folder:
     - Extract labels from matlab files, and save to csv files: ```extract_mat_label.m```
     - Extrac data and timestamp from matlab files, and save to the same folder: ```extract_mat_data.py```
-    - Copy other valid sensor data (sepecify in the next section) to the same folder ```RW1-Walk1-extracted```: currently done manually, could be done automatically by code later. Examples of extracted data here.
+    - Copy other valid sensor data (sepecify in the next section) to the same folder ```RW1-Walk1-extracted```: currently done manually, could be done automatically by code later. Examples of extracted data [here](xx).
 - Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels: ```syncronize.py```
 - Select data from 13 events of interest.
 - Slice data into windows of T seconds (T needs to be defined later) and filter out invalid data.
