@@ -268,7 +268,7 @@ data_pupilphone_gps = np.stack((data_pupilphone_gps_1, data_pupilphone_gps_2))
 print(data_pupilphone_gps.shape, data_pupilphone_gps.shape)
 
 
-for temp_index in range(130):#(label.shape[0]):
+for temp_index in range(label.shape[0]):
 
     start_frame_index = temp_index
     end_frame_index = temp_index + 1
