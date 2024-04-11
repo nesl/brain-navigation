@@ -12,7 +12,7 @@ Code Repository to pre-process the Brain Navigation Data
   
 ## Tasks of data processing
 - Extract and put all valid sensor data in the same folder:  ```extract_mat_data.py```
-- Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels: syncronize.py
+- Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels: ```syncronize.py```
 - Select data from 13 events of interest.
 - Slice data into windows of T seconds (T needs to be defined later) and filter out invalid data.
 - Scale to different subjects and walking sessions.
@@ -20,8 +20,8 @@ Code Repository to pre-process the Brain Navigation Data
 ### Data and timestamp of each sensor for synchronizing 
 - Videos:
     - We use videos from the “Synced” folder, as they are concatenated to one video. And we split audio from videos.
-          - Data in “Synced” folder: pupil and Gopro video are both 60fps; synchronized and have the same length.
-          - Data in “Original” folder: pupil video is 80fps; Gopro video is 60fps and has multiple videos; Gopro and pupil videos have time shifts.
+          * Data in “Synced” folder: pupil and Gopro video are both 60fps; synchronized and have the same length.
+          * Data in “Original” folder: pupil video is 80fps; Gopro video is 60fps and has multiple videos; Gopro and pupil videos have time shifts.
     - We use frames from “RWNApp_RW1_Walk1.mat” for synchronization.
 - Xsense:
     - We use data from “Original” folder, and only choose “xs_Center-of-Mass.csv”.
@@ -47,6 +47,7 @@ Code Repository to pre-process the Brain Navigation Data
     - some events are instant (several frames): Doorway, Choice Point
     - some events are short (<2s): Correct Turn, Lost
     - some events are long (>2s): New Context Beg-New Context End, Include other short events in between
+      
   **Need to verrify the window used for analyzing the brain signal.** For example, the instant event may be the center of the window (10 seconds).
 
 - Unify the event name: Talking Beg, Talking End -> Talking
