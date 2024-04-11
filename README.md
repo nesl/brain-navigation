@@ -11,16 +11,17 @@ Code Repository to pre-process the Brain Navigation Data
 - Events of Interests (13 events): Doorway, Talking, Correct Turn,  Incorrect Turn, Lost, Stop, Abnormal, Pointing, Outdoor, Choice Point, Stare, Beg/End, New Context
   
 ## Tasks of data processing
-- Extract labels, data and timestamp from matlab files; and put other valid sensor data in the same folder:
+- Step 1: Extract labels, data and timestamp from matlab files; and put other valid sensor data in the same folder.
     - Extract labels from matlab files, and save to csv files: ```extract_mat_label.m```
     - Extrac data and timestamp from matlab files, and save to the same folder: ```extract_mat_data.py```
-    - Copy other valid sensor data (sepecify in the next section) to the same folder ```RW1-Walk1-extracted```: currently done manually, could be done automatically by code later. Examples of extracted datafolder [here](xx).
-- Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels: ```syncronize.py```. Examples of syncronized datafolder [here](xx).
-- Select data from 13 events of interest.
-- Slice data into windows of T seconds (T needs to be defined later) and filter out invalid data.
-- Scale to different subjects and walking sessions.
+    - Copy other valid sensor data (sepecify in the next section) to the same folder ```RW1-Walk1-extracted```: currently done manually, could be done automatically by code later. Examples of extracted datafolder [here](https://drive.google.com/drive/folders/1KQeMCWv0vR59Ny9mFTZfRZDt0bZX52QE?usp=sharing).
+- Step 2: Synchronize all sensor data using NTP timestamp; Split them according to each event and save corresponding labels.
+    - ```syncronize.py```. Examples of syncronized datafolder [here](https://drive.google.com/drive/folders/1KQeMCWv0vR59Ny9mFTZfRZDt0bZX52QE?usp=sharing).
+- Step 3: Select data from 13 events of interest.
+- Step 4: Slice data into windows of T seconds (T needs to be defined later) and filter out invalid data.
+- Step 5: Scale to different subjects and walking sessions.
 
-### Data and timestamp of each sensor for synchronizing 
+### Data and timestamp of each sensor for synchronizing (for Step 1)
 - Videos:
     - Data: We use videos from the “Synced” folder, as they are concatenated to one video. And we split audio from videos.
         - Data in “Synced” folder: pupil and Gopro video are both 60fps; synchronized and have the same length.
@@ -36,7 +37,7 @@ Code Repository to pre-process the Brain Navigation Data
     - Timestamp: We use NTP time in each csv file for synchronization.
 - Label: “label_RWNApp_Output_Jan2024”
 
-### Data after synchronization: 14 files for each event
+### Data after synchronization: 14 files for each event (for Step 2)
 - {}_gopro.mp4, {}_pupil.mp4, {}_gopro_audio.wav, 
 - {}_np.npy, 
 - {}_xs_CoM.npy, 
