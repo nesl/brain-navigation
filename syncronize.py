@@ -11,40 +11,6 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips
 import re
 
 
-def extract_video_subset(video_path, start_frame, end_frame, output_path):
-    """
-    Extract a subset of frames from a video file while keeping a subset of the audio.
-
-    Parameters:
-        video_path (str): Path to the input video file.
-        start_frame (int): Starting frame index.
-        end_frame (int): Ending frame index.
-        output_path (str): Path to save the output video file.
-    """
-    # Load video clip
-    video_clip = VideoFileClip(video_path)
-
-    print("video_clip.fps:", video_clip.fps)
-
-    # Extract audio
-    audio_clip = video_clip.audio
-
-    # Extract subset of audio
-    subset_audio_clip = audio_clip.subclip(start_frame / video_clip.fps, end_frame / video_clip.fps)
-
-    # Extract subset of frames
-    subset_clip = video_clip.subclip(start_frame / video_clip.fps, end_frame / video_clip.fps)
-
-    # Set audio for subset clip
-    subset_clip = subset_clip.set_audio(subset_audio_clip)
-
-    # Write video file with audio
-    subset_clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
-
-    # Close the video clip
-    video_clip.close()
-
-
 def extract_video_noaudio_subset(video_path, start_frame, end_frame, output_path):
     """
     Extract a subset of frames from a video file without including audio.
