@@ -19,9 +19,6 @@ from pathlib import Path
 # for filename in filenames:
 #     print(filename)
 
-subject = 1
-walk = 4
-
 save_ori_dirname_map = {
     "chest_phone": "ChestPhone",
     "pupil_phone": "PupilPhone",
@@ -244,5 +241,7 @@ def extract_mat(subject, walk):
 
 
 if __name__ == "__main__":
-    move_files(subject, walk)
-    extract_mat(subject, walk)
+    subject = 1
+    for walk in range(6, 8):
+        move_files(subject, walk)
+        extract_mat(subject, walk)
