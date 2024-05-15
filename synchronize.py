@@ -258,8 +258,6 @@ for walk in range(5, 6):
     time_label = [matlab_datenum_to_formatted_string(md) for md in ntp_label/60/60/24]
     # np.save(save_folder + "time_label", time_label)
     num_of_label = len(time_label)
-    print(num_of_label)
-
 
     # Neural-Pace (NP) signal, GoPro videos, Pupil videos, Xsens, phone (acc, gyro, mag, GPS, light, audio)
     # fre_np = 250, fre_gopro = 60, fre_pupil = 60
@@ -287,69 +285,97 @@ for walk in range(5, 6):
     df = pd.read_csv(load_syncronized_folder + "data_chest_phone_acc.csv", header=None)
     time_chestphone_acc = df.iloc[:, 0]
     data_chestphone_acc = df.iloc[:, 1:]
-    print("chest acc:", time_chestphone_acc.shape, data_chestphone_acc.shape)
+    print("chest acc:", time_chestphone_acc.shape, time_chestphone_acc.iloc[0], data_chestphone_acc.shape, data_chestphone_acc.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_chest_phone_gyro.csv", header=None)
     time_chestphone_gyro = df.iloc[:, 0]
     data_chestphone_gyro = df.iloc[:, 1:]
-    print("chest gyro:", time_chestphone_gyro.shape, data_chestphone_gyro.shape)
+    print("chest gyro:", time_chestphone_gyro.shape, time_chestphone_gyro.iloc[0], data_chestphone_gyro.shape, data_chestphone_gyro.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_chest_phone_mag.csv", header=None)
     time_chestphone_mag = df.iloc[:, 0]
     data_chestphone_mag = df.iloc[:, 1:]
-    print("chest mag:", time_chestphone_mag.shape, data_chestphone_mag.shape)
+    print("chest mag:", time_chestphone_mag.shape, time_chestphone_mag.iloc[0], data_chestphone_mag.shape, data_chestphone_mag.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_chest_phone_light.csv", header=None)
     time_chestphone_light = df.iloc[:, 0]
     data_chestphone_light = df.iloc[:, 1:]
-    print("chest light:", time_chestphone_light.shape, data_chestphone_light.shape)
+    print("chest light:", time_chestphone_light.shape, time_chestphone_light.iloc[0], data_chestphone_light.shape, data_chestphone_light.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_chest_phone_gps.csv", header=None)
     time_chestphone_gps = df.iloc[:, 0]
-    data_chestphone_gps_1 = df.iloc[:, 1].str.extract(r'Lat: (/d+/./d+)', expand=False)## delete the str of "Lat:"
+    data_chestphone_gps_1 = df.iloc[:, 1].str.extract(r'Lat: (\d+\.\d+)', expand=False)## delete the str of "Lat:"
     data_chestphone_gps_1 = np.array(data_chestphone_gps_1.astype(float))
-    data_chestphone_gps_2 = df.iloc[:, 2].str.extract(r'Long: (-?/d+/./d+)', expand=False)## delete the str of "Long:"
+    data_chestphone_gps_2 = df.iloc[:, 2].str.extract(r'Long: (-?\d+\.\d+)', expand=False)## delete the str of "Long:"
     data_chestphone_gps_2 = np.array(data_chestphone_gps_2.astype(float))
     data_chestphone_gps = np.stack((data_chestphone_gps_1, data_chestphone_gps_2), axis=1)
-    print("chest gps:", data_chestphone_gps.shape, time_chestphone_gps.shape)
-
-    time_chestphone_acc = np.array(['2021-04-28_10-54-37-359'])
-    data_chestphone_acc = np.zeros((1,1))
-    time_chestphone_gyro = np.array(['2021-04-28_10-54-37-359'])
-    data_chestphone_gyro = np.zeros((1,1))
-    time_chestphone_mag = np.array(['2021-04-28_10-54-37-359'])
-    data_chestphone_mag = np.zeros((1,1))
-    time_chestphone_light = np.array(['2021-04-28_10-54-37-359'])
-    data_chestphone_light = np.zeros((1,1))
-    time_chestphone_gps = np.array(['2021-04-28_10-54-37-359'])
-    data_chestphone_gps = np.zeros((1,1))
+    print("chest gps:", time_chestphone_gps.shape, time_chestphone_gps[0], data_chestphone_gps.shape, data_chestphone_gps[0])
 
     ## load all of pupilphone data
     df = pd.read_csv(load_syncronized_folder + "data_pupil_phone_acc.csv", header=None)
     time_pupilphone_acc = df.iloc[:, 0]
     data_pupilphone_acc = df.iloc[:, 1:]
-    print("pupil acc:", data_pupilphone_acc.shape, data_pupilphone_acc.shape)
+    print("pupil acc:", time_pupilphone_acc.shape, time_pupilphone_acc.iloc[0], data_pupilphone_acc.shape, data_pupilphone_acc.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_pupil_phone_gyro.csv", header=None)
     time_pupilphone_gyro = df.iloc[:, 0]
     data_pupilphone_gyro = df.iloc[:, 1:]
-    print("pupil gyro:", time_pupilphone_gyro.shape, data_pupilphone_gyro.shape)
+    print("pupil gyro:", time_pupilphone_gyro.shape, time_pupilphone_gyro.iloc[0], data_pupilphone_gyro.shape, data_pupilphone_gyro.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_pupil_phone_mag.csv", header=None)
     time_pupilphone_mag = df.iloc[:, 0]
     data_pupilphone_mag = df.iloc[:, 1:]
-    print("pupil mag:", time_pupilphone_mag.shape, data_pupilphone_mag.shape)
+    print("pupil mag:", time_pupilphone_mag.shape, time_pupilphone_mag.iloc[0], data_pupilphone_mag.shape, time_pupilphone_mag.iloc[0])
 
     df = pd.read_csv(load_syncronized_folder + "data_pupil_phone_gps.csv", header=None)
     time_pupilphone_gps = df.iloc[:, 0]
-    data_pupilphone_gps_1 = df.iloc[:, 1].str.extract(r'Lat: (/d+/./d+)', expand=False)## delete the str of "Lat:"
+    data_pupilphone_gps_1 = df.iloc[:, 1].str.extract(r'Lat: (\d+\.\d+)', expand=False)## delete the str of "Lat:"
     data_pupilphone_gps_1 = np.array(data_pupilphone_gps_1.astype(float))
-    data_pupilphone_gps_2 = df.iloc[:, 2].str.extract(r'Long: (-?/d+/./d+)', expand=False)## delete the str of "Long:"
+    data_pupilphone_gps_2 = df.iloc[:, 2].str.extract(r'Long: (-?\d+\.\d+)', expand=False)## delete the str of "Long:"
     data_pupilphone_gps_2 = np.array(data_pupilphone_gps_2.astype(float))
     data_pupilphone_gps = np.stack((data_pupilphone_gps_1, data_pupilphone_gps_2), axis=1)
-    print("pupil gps:", data_pupilphone_gps.shape, data_pupilphone_gps.shape)
+    print("pupil gps:", time_pupilphone_gps.shape, time_pupilphone_gps[0], data_pupilphone_gps.shape, data_pupilphone_gps[0])
 
     print("xs:", time_xsense.shape, data_xsense.shape, time_xsense[0], time_xsense[-1])
+
+    ## Merge gps data and time in the same second
+    ## Chest phone
+    time = time_chestphone_gps[0]
+    gps_datas = []
+    gps_times = []
+    gps_data = []
+    for idx in range(len(time_chestphone_gps)):
+        if time_chestphone_gps[idx][:19] == time[:19]:
+            gps_data.append(data_chestphone_gps[idx])
+        else:
+            gps_datas.append(np.mean(gps_data, axis=0))
+            # print(idx, gps_datas)
+            gps_times.append(time)
+            gps_data.clear()
+            time = time_chestphone_gps[idx]
+            gps_data.append(data_chestphone_gps[idx])
+
+    time_chestphone_gps = pd.Series(gps_times)
+    data_chestphone_gps = np.array(gps_datas)
+
+    ## Pupil phone
+    time = time_pupilphone_gps[0]
+    gps_datas = []
+    gps_times = []
+    gps_data = []
+    for idx in range(len(time_pupilphone_gps)):
+        if time_pupilphone_gps[idx][:19] == time[:19]:
+            gps_data.append(data_pupilphone_gps[idx])
+        else:
+            gps_datas.append(np.mean(gps_data, axis=0))
+            # print(idx, gps_datas)
+            gps_times.append(time)
+            gps_data.clear()
+            time = time_pupilphone_gps[idx]
+            gps_data.append(data_pupilphone_gps[idx])
+
+    time_pupilphone_gps = pd.Series(gps_times)
+    data_pupilphone_gps = np.array(gps_datas)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     # Split Frames
