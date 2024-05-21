@@ -5,6 +5,8 @@ Code Repository to pre-process the Brain Navigation Data
 ### Sensor data
 - Neural-Pace (NP) signal: 250Hz, 4 channels, may need to remove the large spikes
 - Physics sensor system: Gopro videos (60Hz), Pupil videos (60Hz), Xsens (100Hz, acc), Chestphone (acc, gyro, mag, GPS, light), PupilePhone (acc, gyro, mag, GPS, light)
+- Introduction of dataset: `documents/introduction-brain-navigation-dataset.docx`
+- Introduction of video annotation: `documents/IL-Video Annotations - Real World Navigation-240124-192004.pdf`
 
 ### Annotation of the events: 
 - Original annotation (16 events in total) Doorway, Talking Beg/End, Correct Turn Beg/End,  Incorrect Turn Beg/End, Lost Beg/End, Stop Beg/End, Abnormal, Pointing, Notes, Outdoor, Choice Point, Stare, Held Door, Clapper, Landmark, Beg/End, New Context Beg/End
@@ -69,8 +71,9 @@ Code Repository to pre-process the Brain Navigation Data
     - some events are short (<2s): Correct Turn, Lost
     - some events are long (>2s): New Context Beg-New Context End, Include other short events in between
       
-  **Need to verrify the window used for analyzing the brain signal.** For example, the instant event may be the center of the window (10 seconds).
-
+  
+**Need to verrify the window used for analyzing the brain signal.** For example, the instant event may be the center of the window (10 seconds).
+    
 - Unify the event name: Talking Beg, Talking End -> Talking
 - Missing modality in some sessions and some timestamps (run-time failure)
 - Subject 1 Walk2 and Walk3 miss synchronized xsense time
