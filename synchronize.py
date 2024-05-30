@@ -14,9 +14,9 @@ map_long_sample_freq = {
 } #unit: second
 
 subject = 1
-walks = [3]
-fps_for_frame = 30
-video_sync_modality_frame = 'PupilFrame'
+walks = [1]
+fps_for_frame = 60
+video_sync_modality_frame = 'GoProFrame'
 time_window = 2  # Unit: second
 
 def extract_video_noaudio_subset(video_path, start_frame, end_frame, output_path, time_window = None, fps=None):
