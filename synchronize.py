@@ -14,47 +14,12 @@ map_long_sample_freq = {
 } #unit: second
 
 subject = 1
-walks = [4]
-fps_for_frame = 60
+walks = [3]
+fps_for_frame = 30
+video_sync_modality_frame = 'PupilFrame'
+time_window = 2  # Unit: second
 
-def extract_video_subset(video_path, start_frame, end_frame, output_path, fps=None):
-    """
-    Extract a subset of frames from a video file while keeping a subset of the audio.
-
-    Parameters:
-        video_path (str): Path to the input video file.
-        start_frame (int): Starting frame index.
-        end_frame (int): Ending frame index.
-        output_path (str): Path to save the output video file.
-        fps (int): Frame frequency of video clip (frame per second). Use video_clip.fps if not set.
-    """
-    # Load video clip
-    video_clip = VideoFileClip(video_path)
-    if fps is None:
-        fps = video_clip.fps
-
-    # print("video_clip.fps:", video_clip.fps)
-
-    # Extract audio
-    audio_clip = video_clip.audio
-
-    # Extract subset of audio
-    subset_audio_clip = audio_clip.subclip(start_frame / fps, end_frame / fps)
-
-    # Extract subset of frames
-    subset_clip = video_clip.subclip(start_frame / fps, end_frame / fps)
-
-    # Set audio for subset clip
-    subset_clip = subset_clip.set_audio(subset_audio_clip)
-
-    # Write video file with audio
-    subset_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", logger=None)
-
-    # Close the video clip
-    video_clip.close()
-
-
-def extract_video_noaudio_subset(video_path, start_frame, end_frame, output_path, fps=None):
+def extract_video_noaudio_subset(video_path, start_frame, end_frame, output_path, time_window = None, fps=None):
     """
     Extract a subset of frames from a video file without including audio.
 
@@ -63,12 +28,30 @@ def extract_video_noaudio_subset(video_path, start_frame, end_frame, output_path
         start_frame (int): Starting frame index.
         end_frame (int): Ending frame index.
         output_path (str): Path to save the output video file.
+        time_window (int): Time window for downstream task input. If the piece from start_frame to 
+            end_frame is longer than time window, do nothing; if shorter, expand it to time window.
+            Default is None, and the code won't do anything special.
         fps (int): Frame frequency of video clip (frame per second). Use video_clip.fps if not set.
     """
     # Load video clip
     video_clip = VideoFileClip(video_path)
     if fps is None:
         fps = video_clip.fps
+
+    # print("Extracting video...")
+    # Downstream task requires fixed length data for training, so here we directly extract the data with the required length.
+    # If the event (label) is longer than required length (i.e, time_window), do normal data extraction;
+    # else put the event in the middle, and expand the starting and ending frame to the required length
+    if time_window:
+        # print("original start_frame:", start_frame, "original end_frame:", end_frame)
+        frame_len = end_frame - start_frame
+        expand_frame = int(time_window*fps - frame_len)
+        if expand_frame > 0:
+            total_frames = int(video_clip.duration * fps)
+            start_frame = max(0, start_frame - expand_frame // 2)
+            end_frame = min(total_frames, start_frame + frame_len + expand_frame)
+            # print("expanded start_frame:", start_frame, "expanded end_frame:", end_frame, "frame length: ", end_frame-start_frame)
+            # input("Press Enter to continue...")
 
     # Extract subset of frames
     subset_clip = video_clip.subclip(start_frame / fps, end_frame / fps)
@@ -79,7 +62,8 @@ def extract_video_noaudio_subset(video_path, start_frame, end_frame, output_path
     # Close the video clip
     video_clip.close()
 
-def extract_video_audio_subset(video_path, start_frame, end_frame, output_video_path, output_audio_path, fps=None):
+def extract_video_audio_subset(video_path, start_frame, end_frame, output_video_path, 
+                               output_audio_path, time_window = None, fps=None):
     """
     Extract a subset of frames from a video file and save the video and audio separately.
 
@@ -89,6 +73,9 @@ def extract_video_audio_subset(video_path, start_frame, end_frame, output_video_
         end_frame (int): Ending frame index.
         output_video_path (str): Path to save the output video file.
         output_audio_path (str): Path to save the output audio file.
+        time_window (int): Time window for downstream task input. If the piece from start_frame to 
+            end_frame is longer than time window, do nothing; if shorter, expand it to time window.
+            Default is None, and the code won't do anything special.
         fps (int): Frame frequency of video clip (frame per second). Use video_clip.fps if not set.
     """
     # Validate input parameters
@@ -106,8 +93,27 @@ def extract_video_audio_subset(video_path, start_frame, end_frame, output_video_
     if fps is None:
         fps = video_clip.fps
 
+    # print("Extracting video...")
+    # Downstream task requires fixed length data for training, so here we directly extract the data with the required length.
+    # If the event (label) is longer than required length (i.e, time_window), do normal data extraction;
+    # else put the event in the middle, and expand the starting and ending frame to the required length
+    if time_window:
+        # print("original start_frame:", start_frame, "original end_frame:", end_frame)
+        frame_len = end_frame - start_frame
+        expand_frame = int(time_window*fps - frame_len)
+        if expand_frame > 0:
+            total_frames = int(video_clip.duration * fps)
+            start_frame = max(0, start_frame - expand_frame // 2)
+            end_frame = min(total_frames, start_frame + frame_len + expand_frame)
+            # print("expanded start_frame:", start_frame, "expanded end_frame:", end_frame, "frame length: ", end_frame-start_frame)
+            # input("Press Enter to continue...")
+
+    # Calculate time in seconds for subclipping
+    start_time = start_frame / fps
+    end_time = end_frame / fps
+
     # Extract subset of frames
-    subset_clip = video_clip.subclip(start_frame / fps, end_frame / fps)
+    subset_clip = video_clip.subclip(start_time, end_time)
 
     # Write video file
     subset_clip.write_videofile(output_video_path, codec="libx264", logger=None)
@@ -117,10 +123,6 @@ def extract_video_audio_subset(video_path, start_frame, end_frame, output_video_
 
     # Extract audio
     audio_clip = video_clip.audio
-
-    # Calculate time in seconds for subclipping
-    start_time = start_frame / fps
-    end_time = end_frame / fps
 
     # Extract subset of audio
     subset_audio_clip = audio_clip.subclip(start_time, end_time)
@@ -200,38 +202,61 @@ def extract_modalities(
         end_frame_index : int,
         time_arr : NDArray,
         data_arr : NDArray,
-        event : str, # all events except for gopro. Gopro is processed outside this function.
+        modality : str, # all events except for gopro. Gopro is processed outside this function.
         time_label,
         save_syncronized_splt_folder : str,
+        time_window = None,
+        modality_freq = None,
         do_extract : bool = True, # whether to extract and save the np file. Default is True. If setting to False, this function only returns whether the modality is missing or not.
     ):
     global label_missing_cnt, modalit_missing_time
-    start_frame = find_close_frame(time_label[start_frame_index], time_arr)
-    end_frame = find_close_frame(time_label[end_frame_index], time_arr)
-    dura = calculate_duration(time_label[start_frame_index], time_label[end_frame_index])
+    if modality == 'np':
+        start_frame = time_arr[start_frame_index]
+        end_frame = time_arr[end_frame_index]
+    else:
+        if time_label == None:
+            raise ValueError("time_label can be unset only if modality is neural pace")
+        start_frame = find_close_frame(time_label[start_frame_index], time_arr)
+        end_frame = find_close_frame(time_label[end_frame_index], time_arr)
 
-    # print("time_{}: ".format(event), time_arr[start_frame], time_arr[end_frame], calculate_duration(time_arr[start_frame], time_arr[end_frame]))
+    # Downstream task requires fixed length data for training, so here we directly extract the data with the required length.
+    # If the event (label) is longer than required length (i.e, time_window), do normal data extraction;
+    # else put the event in the middle, and expand the starting and ending frame to the required length
+    # print(f"Extracting {modality}...")
+    if time_window:
+        if not modality_freq:
+            raise ValueError("modality_freq must be provided if time_window is setted.")
+        # print("original start_frame:", start_frame, "original end_frame:", end_frame)
+        frame_len = end_frame - start_frame
+        expand_frame = int(time_window*modality_freq - frame_len)
+        if expand_frame > 0:
+            start_frame = max(0, start_frame - expand_frame // 2)
+            end_frame = min(len(data_arr), start_frame + frame_len + expand_frame)
+            # print("expanded start_frame:", start_frame, "enpanded end_frame:", end_frame, "frame length: ", end_frame-start_frame)
+            # input("Press Enter to continue...")
+
+    # print("time_{}: ".format(modality), time_arr[start_frame], time_arr[end_frame], calculate_duration(time_arr[start_frame], time_arr[end_frame]))
     
-    if event in ['chestphone_acc', 'chestphone_gyro', 'chestphone_mag', 'pupilphone_acc', 'pupilphone_gyro', 'pupilphone_mag', 'xs_CoM']:
+    if modality in ['chestphone_acc', 'chestphone_gyro', 'chestphone_mag', 'pupilphone_acc', 'pupilphone_gyro', 'pupilphone_mag', 'xs_CoM', 'np']:
         if end_frame <= start_frame:
-            label_missing_cnt[event] = label_missing_cnt.get(event, 0) + 1
+            label_missing_cnt[modality] = label_missing_cnt.get(modality, 0) + 1
             return False
         else:
             if do_extract:
-                output_path = save_syncronized_splt_folder + '{}_{}.npy'.format(start_frame_index, event)
+                output_path = save_syncronized_splt_folder + '{}_{}.npy'.format(start_frame_index, modality)
                 np.save(output_path, data_arr[start_frame:end_frame])
             return True
-    elif event in ['chestphone_gps', 'chestphone_light', 'pupilphone_gps']:
+    elif modality in ['chestphone_gps', 'chestphone_light', 'pupilphone_gps']:
         if end_frame <= start_frame:
-            if calculate_time_diff(time_label[start_frame_index], time_arr[start_frame]) > map_long_sample_freq[event]:
-                label_missing_cnt[event] = label_missing_cnt.get(event, 0) + 1
+            if calculate_time_diff(time_label[start_frame_index], time_arr[start_frame]) > map_long_sample_freq[modality]:
+                label_missing_cnt[modality] = label_missing_cnt.get(modality, 0) + 1
                 return False
             else:
                 end_frame += 1
 
         # If end_frame > start_frame or time_diff <= sample_freq, return true
         if do_extract:
-            output_path = save_syncronized_splt_folder + '{}_{}.npy'.format(start_frame_index, event)
+            output_path = save_syncronized_splt_folder + '{}_{}.npy'.format(start_frame_index, modality)
             np.save(output_path, data_arr[start_frame:end_frame])
         
         return True 
@@ -240,19 +265,19 @@ def extract_modalities(
 for walk in walks:
     # fre_np = 250, fre_gopro = 60, fre_pupil = 60
     # Load all data and timestamp: Neural-Pace (NP) signal, GoPro videos, Pupil videos, Xsens, phone (acc, gyro, mag, GPS, light, audio)
-    load_syncronized_folder = f'../../RW{subject}/RW{subject}-Walk{walk}-extracted/'
-    save_syncronized_splt_folder = f'../../synchronized/RW{subject}/RW{subject}-Walk{walk}-self-syncronize-split/'
+    load_syncronized_folder = f'../RW{subject}/RW{subject}-Walk{walk}-extracted/'
+    save_syncronized_splt_folder = f'../synchronized/RW{subject}/RW{subject}-Walk{walk}-self-syncronize-split/'
 
     if not os.path.exists(save_syncronized_splt_folder):
         # Create the directory
         os.makedirs(save_syncronized_splt_folder)
 
     # Event Description PupilFrame  GoProFrame  NPSample    NTP
-    df = pd.read_csv(f'../../label_RWNApp_Output_Jan2024/evnts_RWNApp_RW{subject}_Walk{walk}.csv')
+    df = pd.read_csv(f'../label_RWNApp_Output_Jan2024/evnts_RWNApp_RW{subject}_Walk{walk}.csv')
     label = df['Event']
     ntp_label = df['NTP']
     # PupilFrame = df['PupilFrame']
-    GoProFrame = df['GoProFrame']
+    GoProFrame = df[video_sync_modality_frame]
     NPSample = df['NPSample']
 
     # convert matlab NTP time to datetime timestamp
@@ -281,6 +306,7 @@ for walk in walks:
     time_xsense = np.load(load_syncronized_folder + 'time_xs.npy')
     # frame_xsense = df_xsense['Frame']
     data_xsense = df_xsense.iloc[:, 1:]
+    print("xs:", time_xsense.shape, data_xsense.shape, time_xsense[0], time_xsense[-1])
 
     ## load all of chestphone data
     df = pd.read_csv(load_syncronized_folder + "data_chest_phone_acc.csv", header=None)
@@ -337,8 +363,6 @@ for walk in walks:
     data_pupilphone_gps = np.stack((data_pupilphone_gps_1, data_pupilphone_gps_2), axis=1)
     print("pupil gps:", time_pupilphone_gps.shape, time_pupilphone_gps[0], data_pupilphone_gps.shape, data_pupilphone_gps[0])
 
-    print("xs:", time_xsense.shape, data_xsense.shape, time_xsense[0], time_xsense[-1])
-
     ## Merge gps data and time in the same second - Chest phone
     time = time_chestphone_gps[0]
     gps_datas = []
@@ -379,7 +403,6 @@ for walk in walks:
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     # Split Frames
-    video_clip = VideoFileClip(data_gopro)
     # ntp_start_0 = ntp_label[0] - GoProFrame[0] / video_clip.fps
     # short_frames = [22]
     greped_index = {} # {greped_index: (greped_label, grep reason, time label)} indexs that got filtered
@@ -431,10 +454,10 @@ for walk in walks:
                         end_frame_index += 1
                     if end_frame_index >= num_of_label:
                         raise ValueError(f"Corresponding End event missing: {start_frame_index} {cut_label}")
-                else: # merge successive identical label
-                    while func_extract_label(end_frame_index) == cut_label and end_frame_index < num_of_label:
-                        end_frame_index += 1
-                    temp_index = end_frame_index - 1 # align with the "+1" later
+                # else: # merge successive identical label
+                #     while func_extract_label(end_frame_index) == cut_label and end_frame_index < num_of_label:
+                #         end_frame_index += 1
+                #     temp_index = end_frame_index - 1 # align with the "+1" later
                 ########################
 
                 modality_num = 0
@@ -470,68 +493,154 @@ for walk in walks:
                     print("Greped: ", "np")
                     do_extract = False
                 else:
-                    output_path = save_syncronized_splt_folder + '{}_np.npy'.format(start_frame_index)
-                    np.save(output_path, data_np[start_frame_np:end_frame_np])
+                    extract_modalities(start_frame_index=start_frame_index, end_frame_index=end_frame_index,
+                                       time_arr=NPSample, data_arr=data_np,
+                                       time_label=None,
+                                       save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                       modality='np',
+                                       time_window=time_window,
+                                       modality_freq=250,
+                                       do_extract=do_extract)
                     modality_num += 1
 
                 ############### sample gopro videos ###############
                 if do_extract:
                     output_path = save_syncronized_splt_folder + '{}_gopro.mp4'.format(start_frame_index)
                     output_path_audio = save_syncronized_splt_folder + '{}_gopro_audio.wav'.format(start_frame_index)
-                    extract_video_audio_subset(data_gopro, start_frame_gopro, end_frame_gopro, output_path, output_path_audio, fps=fps_for_frame)
+                    extract_video_audio_subset(data_gopro, start_frame_gopro, end_frame_gopro, output_path, output_path_audio, time_window=time_window, fps=fps_for_frame)
                     modality_num += 2 # will extract two modalities
                 
                     output_path = save_syncronized_splt_folder + '{}_pupil.mp4'.format(start_frame_index)
-                    extract_video_noaudio_subset(data_pupil, start_frame_gopro, end_frame_gopro, output_path, fps=fps_for_frame)
+                    extract_video_noaudio_subset(data_pupil, start_frame_gopro, end_frame_gopro, output_path, time_window=time_window, fps=fps_for_frame)
                     modality_num += 1
 
                 ############### sample other data ###############
-                if extract_modalities(start_frame_index, end_frame_index, time_chestphone_acc, data_chestphone_acc, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='chestphone_acc', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_chestphone_acc, data_chestphone_acc,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='chestphone_acc',
+                                      time_window=time_window,
+                                      modality_freq=100,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('chestphone_acc')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_chestphone_gyro, data_chestphone_gyro, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='chestphone_gyro', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_chestphone_gyro, data_chestphone_gyro,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='chestphone_gyro',
+                                      time_window=time_window,
+                                      modality_freq=50,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('chestphone_gyro')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_chestphone_mag, data_chestphone_mag, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='chestphone_mag', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_chestphone_mag, data_chestphone_mag,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='chestphone_mag',
+                                      time_window=time_window,
+                                      modality_freq=50,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('chestphone_mag')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_chestphone_gps, data_chestphone_gps, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='chestphone_gps', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_chestphone_gps, data_chestphone_gps,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='chestphone_gps',
+                                      time_window=None,
+                                      modality_freq=None,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('chestphone_gps')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_chestphone_light, data_chestphone_light, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='chestphone_light', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_chestphone_light, data_chestphone_light,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='chestphone_light',
+                                      time_window=time_window,
+                                      modality_freq=10,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('chestphone_light')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_pupilphone_acc, data_pupilphone_acc, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='pupilphone_acc', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_pupilphone_acc, data_pupilphone_acc,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='pupilphone_acc',
+                                      time_window=time_window,
+                                      modality_freq=100,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('pupilphone_acc')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_pupilphone_gyro, data_pupilphone_gyro, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='pupilphone_gyro', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_pupilphone_gyro, data_pupilphone_gyro,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='pupilphone_gyro',
+                                      time_window=time_window,
+                                      modality_freq=50,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('pupilphone_gyro')
                 
-                if extract_modalities(start_frame_index,  end_frame_index, time_pupilphone_mag, data_pupilphone_mag, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='pupilphone_mag', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_pupilphone_mag, data_pupilphone_mag,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='pupilphone_mag',
+                                      time_window=time_window,
+                                      modality_freq=50,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('pupilphone_mag')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_pupilphone_gps, data_pupilphone_gps, time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, event='pupilphone_gps', do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_pupilphone_gps, data_pupilphone_gps,
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      modality='pupilphone_gps',
+                                      time_window=None,
+                                      modality_freq=None,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('pupilphone_gps')
                 
-                if extract_modalities(start_frame_index, end_frame_index, time_xsense, data_xsense, event='xs_CoM', time_label=time_label, save_syncronized_splt_folder=save_syncronized_splt_folder, do_extract=do_extract):
+                if extract_modalities(start_frame_index, end_frame_index,
+                                      time_xsense, data_xsense,
+                                      modality='xs_CoM',
+                                      time_label=time_label,
+                                      save_syncronized_splt_folder=save_syncronized_splt_folder,
+                                      time_window=time_window,
+                                      modality_freq=100,
+                                      do_extract=do_extract
+                                    ):
                     modality_num += 1
                 else:
                     missing_modality.append('xs_CoM')
